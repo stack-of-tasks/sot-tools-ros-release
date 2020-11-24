@@ -1,0 +1,92 @@
+
+# Copyright 2012, 2020 CNRS
+# Author: Florent Lamiraux, Guilhem Saurel
+#
+
+CMAKE_MINIMUM_REQUIRED(VERSION 3.1)
+
+# Project properties
+SET(PROJECT_ORG stack-of-tasks)
+SET(PROJECT_NAME sot-tools)
+SET(PROJECT_DESCRIPTION "Miscellanous entities for the stack of tasks")
+SET(PROJECT_URL "https://github.com/${PROJECT_ORG}/${PROJECT_NAME}")
+
+# Project options
+OPTION(BUILD_PYTHON_INTERFACE "Build the python bindings" ON)
+OPTION(INSTALL_PYTHON_INTERFACE_ONLY "Install *ONLY* the python bindings" OFF)
+OPTION(SUFFIX_SO_VERSION "Suffix library name with its version" ON)
+
+# Project configuration
+IF(NOT INSTALL_PYTHON_INTERFACE_ONLY)
+  SET(PROJECT_USE_CMAKE_EXPORT TRUE)
+ENDIF(NOT INSTALL_PYTHON_INTERFACE_ONLY)
+SET(CUSTOM_HEADER_DIR "sot/tools")
+SET(CXX_DISABLE_WERROR TRUE)
+SET(DOXYGEN_USE_MATHJAX YES)
+
+# JRL-cmakemodule setup
+INCLUDE(cmake/base.cmake)
+INCLUDE(cmake/boost.cmake)
+INCLUDE(cmake/python.cmake)
+
+# Project definition
+COMPUTE_PROJECT_ARGS(PROJECT_ARGS LANGUAGES CXX)
+PROJECT(${PROJECT_NAME} ${PROJECT_ARGS})
+
+# Project dependencies
+ADD_PROJECT_DEPENDENCY(sot-core REQUIRED PKG_CONFIG_REQUIRES sot-core)
+
+IF(BUILD_PYTHON_INTERFACE)
+  FINDPYTHON()
+  SEARCH_FOR_BOOST_PYTHON(REQUIRED)
+  STRING(REGEX REPLACE "-" "_" PYTHON_DIR ${CUSTOM_HEADER_DIR})
+  ADD_PROJECT_DEPENDENCY(dynamic-graph-python 4.0.0 REQUIRED
+    PKG_CONFIG_REQUIRES dynamic-graph-python)
+ENDIF(BUILD_PYTHON_INTERFACE)
+find_package(Boost COMPONENTS unit_test_framework REQUIRED)
+
+# Verbosity level
+IF(NOT (\"${CMAKE_VERBOSITY_LEVEL}\" STREQUAL \"\"))
+  ADD_DEFINITIONS(-DVP_DEBUG_MODE=${CMAKE_VERBOSITY_LEVEL} -DVP_DEBUG)
+ENDIF(NOT (\"${CMAKE_VERBOSITY_LEVEL}\" STREQUAL \"\"))
+
+
+# Main Library
+SET(${PROJECT_NAME}_HEADERS
+  include/${CUSTOM_HEADER_DIR}/cubic-interpolation.hh
+  include/${CUSTOM_HEADER_DIR}/cubic-interpolation-se3.hh
+  include/${CUSTOM_HEADER_DIR}/kinematic-planner.hh
+  include/${CUSTOM_HEADER_DIR}/oscillator.hh
+  include/${CUSTOM_HEADER_DIR}/seqplay.hh
+  include/${CUSTOM_HEADER_DIR}/simpleseqplay.hh
+  )
+
+SET(${PROJECT_NAME}_SOURCES
+  src/cubic-interpolation.cc
+  #src/kinematic-planner.cc
+  src/cubic-interpolation-se3.cc
+  src/oscillator.cc
+  src/seqplay.cc
+  src/simpleseqplay.cc
+  )
+
+ADD_LIBRARY(${PROJECT_NAME} SHARED
+  ${${PROJECT_NAME}_SOURCES} ${${PROJECT_NAME}_HEADERS})
+TARGET_INCLUDE_DIRECTORIES(${PROJECT_NAME} PUBLIC $<INSTALL_INTERFACE:include>)
+TARGET_LINK_LIBRARIES(${PROJECT_NAME} sot-core::sot-core)
+
+IF(SUFFIX_SO_VERSION)
+  SET_TARGET_PROPERTIES(${PROJECT_NAME} PROPERTIES SOVERSION ${PROJECT_VERSION})
+ENDIF(SUFFIX_SO_VERSION)
+
+IF(NOT INSTALL_PYTHON_INTERFACE_ONLY)
+  INSTALL(TARGETS ${PROJECT_NAME} EXPORT ${TARGETS_EXPORT_NAME} DESTINATION lib)
+ENDIF(NOT INSTALL_PYTHON_INTERFACE_ONLY)
+
+ADD_SUBDIRECTORY(src)
+ADD_SUBDIRECTORY(tests)
+
+PKG_CONFIG_APPEND_LIBS(${PROJECT_NAME})
+IF(NOT INSTALL_PYTHON_INTERFACE_ONLY)
+  INSTALL(FILES package.xml DESTINATION share/${PROJECT_NAME})
+ENDIF(NOT INSTALL_PYTHON_INTERFACE_ONLY)
