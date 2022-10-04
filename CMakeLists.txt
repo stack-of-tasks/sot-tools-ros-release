@@ -32,7 +32,6 @@ project(${PROJECT_NAME} ${PROJECT_ARGS})
 
 # Project dependencies
 if(BUILD_PYTHON_INTERFACE)
-  set(PYTHON_EXECUTABLE "/usr/bin/python3")
   add_project_dependency(dynamic-graph-python 4.0.0 REQUIRED)
   string(REGEX REPLACE "-" "_" PYTHON_DIR ${CUSTOM_HEADER_DIR})
 endif(BUILD_PYTHON_INTERFACE)
