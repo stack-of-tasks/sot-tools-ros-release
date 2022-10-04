@@ -1,3 +1,26 @@
+## sot-tools (noetic) - 2.3.5-2
+
+The packages in the `sot-tools` repository were released into the `noetic` distro by running `/usr/bin/bloom-release sot-tools --rosdistro noetic` on `Tue, 04 Oct 2022 08:39:24 -0000`
+
+The `sot-tools` package was released.
+
+Version of package(s) in repository `sot-tools`:
+
+- upstream repository: https://github.com/stack-of-tasks/sot-tools.git
+- release repository: https://github.com/stack-of-tasks/sot-tools-ros-release.git
+- rosdistro version: `2.3.5-1`
+- old version: `2.3.5-1`
+- new version: `2.3.5-2`
+
+Versions of tools used:
+
+- bloom version: `0.11.2`
+- catkin_pkg version: `0.5.2`
+- rosdep version: `0.22.1`
+- rosdistro version: `0.9.0`
+- vcstools version: `0.1.42`
+
+
 ## sot-tools (noetic) - 2.3.5-1
 
 The packages in the `sot-tools` repository were released into the `noetic` distro by running `/usr/bin/bloom-release sot-tools --rosdistro noetic` on `Wed, 07 Sep 2022 13:25:34 -0000`
